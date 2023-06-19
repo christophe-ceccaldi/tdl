@@ -1,0 +1,479 @@
+/* *****************
+    Styles généraux
+***************** */
+
+body {
+    background-color: #333;
+    font-family: "Open Sans", sans-serif;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+  }
+  
+  a {
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  h1 {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    /* color: #333; */
+  }
+  
+  h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+  
+  h3 {
+    font-size: 1.3em;
+    font-weight: bold;
+    line-height: 1;
+  }
+  
+  h4 {
+    font-size: 1em;
+  }
+  
+  p {
+    font-size: 1em;
+  }
+  
+  .container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  .centrage_main {
+    text-align: center;
+    width: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .centrage {
+    text-align: center;
+    width: 90%;
+    margin: auto;
+    /* margin-bottom: 2%; */
+  }
+  
+  /* media pour la taille de la police */
+  @media screen and (max-width: 600px) {
+    body {
+      font-size: 12px;
+    }
+  }
+  
+  /* *****************
+      Header
+  *************** */
+  
+  header {
+    display: block;
+    background-color: #fafafa;
+    color: #333;
+    width: 100%;
+    top: 0;
+    clear: both;
+  }
+  
+  header > .container {
+    height: 8vh;
+  }
+  
+  header .flex {
+    /* text-align: center; */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    align-content: center;
+    height: 100%;
+  }
+  
+  #center {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  
+  header button {
+    background-color: #7d7d7d;
+    border: 1px solid #7d7d7d9a;
+    border-radius: 15px;
+    color: #fafafa;
+    font-size: 20px;
+    /* font-weight: bold; */
+    padding: 10px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    margin-right: 10px;
+    margin-left: 10px;
+    transition: 0.5s;
+    cursor: pointer;
+  }
+  
+  header button:hover {
+    background-color: #a6a6a6;
+  }
+  
+  /* *****************
+      Footer
+  ****************** */
+  
+  footer {
+    background-color: #fafafa;
+    color: #333;
+    text-align: center;
+    padding: 10px;
+    font-size: 20px;
+  }
+  
+  footer .centrage {
+    width: 100%;
+  }
+  
+  .flex_footer {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    align-content: center;
+  }
+  
+  .logo {
+    flex-basis: 20%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 20%;
+  }
+  
+  .link {
+    position: relative;
+    transition: all 0.3s;
+  }
+  
+  .link img {
+    max-width: 5vw;
+    width: auto;
+    cursor: pointer;
+  }
+  
+  .link:hover {
+    transform: translateY(-10%);
+    box-shadow: 0 10px 20px #fafafa;
+  }
+  
+  #perso {
+    flex-basis: 40%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 20%;
+  }
+  
+  #perso img {
+    max-width: 10vw;
+  }
+  
+  /* *****************
+      Main
+  ****************** */
+  
+  main {
+    display: block;
+    min-height: 92vh;
+    margin-top: 2%;
+    margin-bottom: 1.5%;
+    color: #fafafa;
+  }
+  
+  main button {
+    background-color: #fafafa;
+    border: 1px solid #c2c2c2c6;
+    border-radius: 15px;
+    color: #333;
+    font-size: 20px;
+    /* font-weight: bold; */
+    padding: 10px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+    margin-left: 10px;
+    transition: 0.5s;
+    cursor: pointer;
+  }
+  
+  main button:hover {
+    background-color: #dadada;
+  }
+  
+  .center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .center p {
+    font-size: 20px;
+  }
+  
+  /* ********************
+      Main - Accueil
+  ********************* */
+  #intro {
+    margin-top: 5%;
+  }
+  
+  /* *****************
+      Formulaires
+  ****************** */
+  
+  .background_form {
+    margin-top: 2%;
+    padding: 20px;
+    background-color: #fafafa;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #7d7d7d;
+    color: #333;
+  }
+  
+  .background_form p {
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  form {
+    display: flex;
+    flex-flow: column wrap;
+  }
+  
+  form label {
+    font-size: 1em;
+    margin-bottom: 5px;
+  }
+  
+  form input {
+    font-size: 1em;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #7d7d7d;
+    border-radius: 5px;
+  }
+  
+  form input[type="submit"] {
+    background-color: #93d36e;
+    color: #fafafa;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+    margin-left: 10px;
+    transition: 0.5s;
+    border-radius: 15px;
+    cursor: pointer;
+  }
+  
+  form input[type="submit"]:hover {
+    background-color: #b4ff88;
+  }
+  
+  /* Partie Inscription */
+  #inscription {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  
+  #inscription section {
+    flex-basis: 40%;
+  }
+  
+  #inscription form input {
+    width: 60%;
+    margin: auto;
+  }
+  
+  /* Partie Connexion */
+  #connexion {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  
+  #connexion section {
+    flex-basis: 40%;
+  }
+  
+  #connexion form input {
+    width: 60%;
+    margin: auto;
+  }
+  
+  /* Media pour la connexion et l'inscription */
+  @media screen and (max-width: 800px) {
+    #inscription {
+      flex-flow: column-reverse wrap;
+      justify-content: center;
+      align-items: center;
+    }
+  
+    #inscription section {
+      flex-basis: 100%;
+    }
+  
+    #connexion {
+      flex-flow: column wrap;
+      justify-content: center;
+      align-items: center;
+    }
+  
+    #connexion section {
+      flex-basis: 100%;
+    }
+  }
+  
+  /* *****************
+      ToDoList
+  ****************** */
+  
+  #hidden {
+    display: none;
+  }
+  
+  #droit {
+    display: block;
+    margin-bottom: 1%;
+    background-color: #5b5b5b;
+    border-radius: 10px;
+    padding: 5px;
+  }
+  
+  #droit > section {
+    /* height: 100%; */
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    gap: 2%;
+  }
+  
+  #droit .background_form {
+    margin: 0;
+    padding: 0;
+  }
+  
+  #droit section {
+    flex-basis: 30%;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+  
+  #usersRights {
+    text-align: left;
+  }
+  
+  #formUsersTasks > select {
+    font-size: 1em;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #7d7d7d;
+    border-radius: 5px;
+  }
+  
+  #addTask {
+    /* height: 15vh; */
+    width: 60%;
+    margin: auto;
+  }
+  
+  #addTask h2 {
+    margin-top: 0.5%;
+    margin-bottom: 2%;
+  }
+  
+  .toggle {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .toggle input {
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  #todolist form {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  
+  #lists {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    align-items: start;
+    gap: 2%;
+  }
+  
+  #lists > * {
+    flex-basis: 40%;
+  }
+  
+  #toDo,
+  #done {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 2%;
+  }
+  
+  #toDo > *,
+  #done > * {
+    flex: 1 1 300px;
+  }
+  
+  .section_Task {
+    background-color: #b1b1b1;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #7d7d7d;
+    margin-bottom: 10px;
+    padding: 5px;
+  }
+  
+  .fa-check {
+    color: green;
+    cursor: pointer;
+  }
+  
+  .fa-xmark {
+    color: red;
+    cursor: pointer;
+  }
+  
+  /* Media pour les lists */
+  @media screen and (max-width: 800px) {
+    #lists {
+      flex-flow: column wrap;
+      justify-content: center;
+      align-items: center;
+    }
+  
+    #lists > * {
+      flex-basis: 100%;
+    }
+  }

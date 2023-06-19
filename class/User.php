@@ -5,7 +5,9 @@ class User
 {
     /* Propriétés */
     private $id;
-    private $login;
+    public $nom;
+    public $prenom;
+    public $login;
     private $password;
     private $bdd;
 
@@ -19,12 +21,13 @@ class User
         $db_username = 'root';
         $db_password = '';
 
+        //connection à la DB en PDO en ligne
         // en ligne ///////////////////
-        // $servername = 'localhost';
-        // $dbname = 'christophe_tdl';
-        // $db_username = 'adminbdd';
-        // $db_password = 'basededonnees';
-
+        //$servername = 'localhost';
+        //$dbname = 'christophe-ceccaldi_tdl';
+        //$db_username = 'cc_tdl';
+        //$db_password = 'CCDatabase13';
+       
 
         // essaie de connexion
         try {
@@ -32,7 +35,7 @@ class User
 
             // On définit le mode d'erreur de PDO sur Exception
             $this->bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            //echo "Connexion réussie"; 
+            // echo "Connexion réussie"; 
             $this->bdd->exec("set names utf8");
         }
         // si erreur, on capture les exceptions, s'il y en a une on affiche les infos
@@ -63,88 +66,74 @@ class User
 
     /* Méthodes */
     // Enregistrement
-    public function register($login, $name, $surname, $password)
+    public function register($nom,$prenom,$login, $password)
     {
 
-        // htmlspecialchars pour les paramètres
-        $login = htmlspecialchars($login);
-        $name = htmlspecialchars($name);
-        $surname = htmlspecialchars($surname);
-        $password = htmlspecialchars($password);
         $password = password_hash($password, PASSWORD_DEFAULT);
 
-        // requête pour ajouter l'utilisateur dans la base de données
-        $requete = "INSERT INTO utilisateurs (login, prenom, nom,password) VALUES (:login, :name, :surname, :password)";
+        try {
+            // requête pour ajouter un utilisateur dans la base de données
+            $requete = "INSERT INTO utilisateurs (nom, prenom, login, password) VALUES (:nom, :prenom, :login, :password)";
 
-        // préparation de la requête
-        $insert = $this->bdd->prepare($requete);
+            // préparation de la requête
+            $insert = $this->bdd->prepare($requete);
 
-        // exécution de la requête avec liaison des paramètres
 
-        $insert->execute(array(
-            ':login' => $login,
-            ':name' => $name,
-            ':surname' => $surname,
-            ':password' => $password,
-        ));
+            // exécution de la requête avec liaison des paramètres
 
-        // récupération de l'id
-        $this->id = $this->bdd->lastInsertId();
+            $insert->execute(array(
+                ':nom' => $nom, 
+                ':prenom' => $prenom,
+                ':login' => $login,
+                ':password' => $password,
+            ));
 
-        // rajout de l'id dans la colonne id_droit
-        $requete = "UPDATE utilisateurs SET id_droit = :id WHERE id = :id";
-        $update = $this->bdd->prepare($requete);
-        $update->execute(array(
-            ':id' => $this->id,
-        ));
+            return true;
 
-        echo "ok"; // inscription réussie
+        } catch (PDOException $e) {
+            return false;
+        }
 
-        // fermer la connexion
-        $this->bdd = null;
+        // echo "ok"; // inscription réussie
+
+        
     }
 
     // Connexion
-    public function connect($login, $password)
+    public function connect($login, $password): bool
     {
 
         // requête
         $requete = "SELECT * FROM utilisateurs where login = :login";
-
         // préparation de la requête
         $select = $this->bdd->prepare($requete);
+        $select->execute(array(':login' => $login));
 
-        // htmlspecialchars pour les paramètres
-        $login = htmlspecialchars($login);
-        $password = htmlspecialchars($password);
 
         // récupération du mot de passe avec ASSOC
-        $select->execute(array(':login' => $login));
-        $fetch_assoc = $select->fetch(PDO::FETCH_ASSOC);
-        $password_hash = $fetch_assoc['password'];
+        $user = $select->fetch(PDO::FETCH_ASSOC);
+        $password_hash = $user['password'];
 
         if (password_verify($password, $password_hash)) {
-            // récupération des données pour les attribuer aux attributs
-            $this->id = $fetch_assoc['id'];
-            $this->login = $fetch_assoc['login'];
-            $this->password = $fetch_assoc['password'];
+            // récupération des données 
+            $this->id = $user['id'];
+            $this->login = $user['login'];
+            $this->password = $user['password'];
+
 
             $_SESSION['user'] = [
-                'id' => $fetch_assoc['id'],
-                'login' => $fetch_assoc['login'],
-                'password' => $fetch_assoc['password'],
+                'id' => $user['id'],
+                'login' => $user['login'],
+                'password' => $user['password']
             ];
-            // connexion réussie
 
-            $error = "ok";
-            echo $error;
+            return true;
         } else {
-            $error = "incorrect";
-            echo $error; // mot de passe incorrect
+            return false;
         }
 
         // fermer la connexion
-        $this->bdd = null;
+       // $this->bdd = null;
     }
 
     // Déconnexion
@@ -166,6 +155,136 @@ class User
         }
     }
 
+    // Suppression
+    public function delete()
+    {
+        //vérification que la personne est connecté
+        if ($this->isConnected()) {
+            // requête pour supprimer l'utilisateur dans la base de données
+            $requete = "DELETE FROM utilisateurs WHERE id = :id";
+            // préparation de la requête
+            $delete = $this->bdd->prepare($requete);
+            // exécution de la requête avec liaison des paramètres
+            $delete->execute(array(':id' => $this->id));
+
+            $this->disconnect();
+            $error = "Suppression et deconnexion réussies";
+            return $error; // suppression réussie
+        } else {
+            $error = "Vous n'êtes pas connecté, vous devez être connecté pour supprimer le compte";
+            return $error; // utilisateur non connecté
+        }
+        // fermer la connexion
+        $this->bdd = null;
+    }
+
+    // Modification login
+    public function updateLogin($login, $old, $password)
+    {
+        // requête
+        $requete = "SELECT * FROM utilisateurs where login = :old";
+
+        // préparation de la requête
+        $select = $this->bdd->prepare($requete);
+
+        // htmlspecialchars pour les paramètres
+        $old = htmlspecialchars($old);
+        $login = htmlspecialchars($login);
+        $password = htmlspecialchars($password);
+
+        // récupération du mot de passe avec ASSOC
+        $select->execute(array(':old' => $old));
+        $fetch_assoc = $select->fetch(PDO::FETCH_ASSOC);
+        $password_hash = $fetch_assoc['password'];
+
+        if (password_verify($password, $password_hash)) {
+            // requête pour modifier le login dans la base de données
+            $requete2 = "UPDATE utilisateurs SET login=:login WHERE id=:id";
+            // préparation de la requête
+            $update = $this->bdd->prepare($requete2);
+            // exécution de la requête avec liaison des paramètres
+            $update->execute(array(
+                ':login' => $login,
+                ':id' => $this->id,
+            ));
+            // récupération des données 
+            $this->id = $fetch_assoc['id'];
+            $this->login = $login;
+            $this->password = $fetch_assoc['password'];
+
+            $_SESSION['user'] = [
+                'id' => $fetch_assoc['id'],
+                'login' => $login,
+                'password' => $fetch_assoc['password'],
+            ];
+            // update réussie
+            $error = "ok";
+            echo $error;
+        } else {
+            $error = "incorrect";
+            echo $error; // mot de passe incorrect
+        }
+
+        // fermer la connexion
+        $this->bdd = null;
+    }
+
+    // Modification mot de passe
+    public function updatePassword($password, $newPassword)
+    {
+        // requête
+        $requete = "SELECT * FROM utilisateurs where login = :login";
+
+        // préparation de la requête
+        $select = $this->bdd->prepare($requete);
+
+        // htmlspecialchars pour les paramètres
+        $login = htmlspecialchars($this->login);
+        $password = htmlspecialchars($password);
+        $newPassword = htmlspecialchars($newPassword);
+
+        // récupération du mot de passe avec ASSOC
+        $select->execute(array(':login' => $login));
+        $fetch_assoc = $select->fetch(PDO::FETCH_ASSOC);
+        $password_hash = $fetch_assoc['password'];
+
+        if (password_verify(
+            $password,
+            $password_hash
+        )) {
+            // requête pour modifier le password dans la base de données
+            $requete2 = "UPDATE utilisateurs SET password=:password WHERE id=:id";
+            // préparation de la requête
+            $update = $this->bdd->prepare($requete2);
+            // hash du nouveau mdp
+            $newPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            // exécution de la requête avec liaison des paramètres
+            $update->execute(array(
+                ':password' => $newPassword,
+                ':id' => $this->id,
+            ));
+            // récupération des données 
+            $this->id = $fetch_assoc['id'];
+            $this->login = $login;
+            $this->password = $newPassword;
+
+            $_SESSION['user'] = [
+                'id' => $fetch_assoc['id'],
+                'login' => $login,
+                'password' => $newPassword,
+            ];
+            // update réussie
+            $error = "ok";
+            echo $error;
+        } else {
+            $error = "incorrect";
+            echo $error; // mot de passe incorrect
+        }
+
+        // fermer la connexion
+        $this->bdd = null;
+    }
+
     // Vérification de la connexion
     public function isConnected()
     {
@@ -175,6 +294,50 @@ class User
             return false; // utilisateur non connecté
         }
     }
+
+    // Récupération des données
+    public function getAllInfos()
+    {
+        //vérification que la personne est connecté
+        if ($this->isConnected()) {
+            //affichage
+?>
+            <table class="infos">
+                <thead>
+                    <tr>
+                        <th>Login</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><?= $this->login; ?></td>
+                    </tr>
+                </tbody>
+            </table>
+<?php
+        } else {
+            echo "Vous n'êtes pas connecté, vous devez être connecté pour voir les informations du compte";
+        }
+    }
+
+// Utilisateur déjà existant?
+public function getAllUsers()
+{
+    // requête pour vérifier que le login choisi n'est pas déjà utilisé
+    $requete = "SELECT * FROM utilisateurs" ;
+
+    // préparation de la requête
+    $select = $this->bdd->prepare($requete);
+
+    // exécution de la requête avec liaison des paramètres
+    $select->execute([]);
+
+    // récupération du tableau
+    $result = $select->fetchAll();
+    return $result;
+
+}
+
 
     // Utilisateur déjà existant?
     public function isUserExist($login)
@@ -192,7 +355,7 @@ class User
         $select->execute(array(':login' => $login));
 
         // récupération du tableau
-        $fetch_all = $select->fetchAll();
+        $fetch_all = $select->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($fetch_all) === 0) { // login disponible
             $reponse = "dispo";
@@ -203,80 +366,7 @@ class User
         }
     }
 
-    // récupérer tous les users
-    public function getAllUsers()
-    {
-        // requête pour récupérer tous les utilisateurs
-        $requete = "SELECT * FROM utilisateurs";
 
-        // préparation de la requête
-        $select = $this->bdd->prepare($requete);
-
-        // exécution de la requête
-        $select->execute();
-
-        // récupération du tableau
-        $fetch = $select->fetchAll(PDO::FETCH_ASSOC);
-
-        // fermer la connexion
-        $this->bdd = null;
-
-        return $fetch;
-    }
-
-    // récupérer la colonne id_droit de l'utilisateur connecté
-    public function getDroit()
-    {
-        // requête pour récupérer l'id_droit de l'utilisateur connecté
-        $requete = "SELECT id_droit FROM utilisateurs where id = :id";
-
-        // préparation de la requête
-        $select = $this->bdd->prepare($requete);
-
-        // exécution de la requête avec liaison des paramètres
-        $select->execute(array(':id' => $this->id));
-
-        // récupération du tableau
-        $fetch = $select->fetch(PDO::FETCH_ASSOC);
-
-        // fermer la connexion
-        $this->bdd = null;
-
-        return $fetch;
-    }
-
-    // ajouter les droits à un utilisateur
-    public function addDroit($idOther)
-    {
-        $requete = "SELECT id_droit FROM utilisateurs where id = :id";
-
-        // préparation de la requête
-        $select = $this->bdd->prepare($requete);
-
-        // exécution de la requête avec liaison des paramètres
-        $select->execute(array(':id' => $idOther));
-
-        // récupération du tableau
-        $droits = $select->fetch(PDO::FETCH_ASSOC);
-
-        // ajout de l'id de l'utilisateurs connecté à la suite de $droits, séparé par une virgule
-        $droits['id_droit'] .= ',' . $this->id;
-
-        // requête pour ajouter les droits à l'utilisateur
-        $requete2 = "UPDATE utilisateurs SET id_droit = :id_droit WHERE id = :id";
-
-        // préparation de la requête
-        $update = $this->bdd->prepare($requete2);
-
-        // exécution de la requête avec liaison des paramètres
-        $update->execute(array(
-            ':id_droit' => $droits['id_droit'],
-            ':id' => $idOther,
-        ));
-
-        // fermer la connexion
-        $this->bdd = null;
-
-        echo "ok"; // droits ajoutés
-    }
 }
+
+?>
